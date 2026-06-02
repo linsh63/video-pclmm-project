@@ -1,0 +1,49 @@
+# Local planning notes
+doc/brain/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.conda/
+.cache/
+.tmp/
+conda-pkgs/
+pip-cache/
+
+# Local machine config
+configs/paths.yaml
+configs/*.local.yaml
+
+# Raw data and generated features
+data/annotations/*.csv
+data/processed/*.csv
+data/raw/
+features/
+pretrained/
+temp/
+*.zip
+*.mp4
+*.wav
+*.npy
+*.pkl
+*.pt
+*.pth
+
+# Runtime outputs
+outputs/*
+!outputs/figures/
+!outputs/figures/.gitkeep
+!outputs/metrics/
+!outputs/metrics/.gitkeep
+!outputs/predictions/
+!outputs/predictions/.gitkeep
+*.log
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
