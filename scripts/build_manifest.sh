@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PYTHON_BIN="${PYTHON_BIN:-/data4/songxinshuai/conda/envs/video-pclmm/bin/python}"
+PYTHON_BIN="${PYTHON_BIN:-python}"
 
 ANNOTATION_FILE="${ANNOTATION_FILE:-$PROJECT_ROOT/data/annotations/Annotation_Subset.csv}"
 VIDEO_ROOT="${VIDEO_ROOT:-$PROJECT_ROOT/data/raw/videos}"

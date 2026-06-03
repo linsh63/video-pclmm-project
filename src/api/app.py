@@ -110,7 +110,7 @@ class ApiSettings:
             resident_face_batch_size=int(os.environ.get("PCLMM_API_FACE_BATCH_SIZE", "4")),
             resident_whisper_model=os.environ.get("WHISPER_MODEL", "large"),
             resident_whisper_cache_dir=resolve_path(
-                os.environ.get("WHISPER_CACHE_DIR", "/data4/songxinshuai/cache/whisper")
+                os.environ.get("WHISPER_CACHE_DIR", "outputs/cache/whisper")
             ),
             resident_torch_home=resolve_path(
                 os.environ.get("TORCH_HOME", "outputs/cache/torch")

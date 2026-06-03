@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PYTHON_BIN="${PYTHON_BIN:-/data4/songxinshuai/conda/envs/video-pclmm/bin/python}"
+PYTHON_BIN="${PYTHON_BIN:-python}"
 MANIFEST="${MANIFEST:-$PROJECT_ROOT/data/processed/video_manifest.csv}"
 SMOKE_ROOT="${SMOKE_ROOT:-$PROJECT_ROOT/outputs/smoke_videos}"
 GROUP="${GROUP:-disabled}"

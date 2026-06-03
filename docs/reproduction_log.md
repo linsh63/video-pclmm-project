@@ -17,7 +17,7 @@
 - Current base Python observed before creating the project environment: Python 3.12.2.
 - Official dependencies are pinned in `third_party/PCLMM/requirements.txt` and mirrored in project `requirements.txt`.
 - Commands that create environments, install packages, or modify system dependencies should be executed manually by the project owner.
-- Root filesystem has limited free space, so environment creation should use `-p /data4/songxinshuai/conda/envs/video-pclmm`, `CONDA_PKGS_DIRS=/data4/songxinshuai/conda/pkgs`, `TMPDIR=/data4/songxinshuai/tmp`, and `PIP_NO_CACHE_DIR=1`.
+- Root filesystem may have limited free space on shared servers, so environment creation should use `-p <CONDA_ENV_PATH>`, `CONDA_PKGS_DIRS=<CONDA_ROOT>/pkgs`, `TMPDIR=<TMPDIR>`, and `PIP_NO_CACHE_DIR=1`.
 - Default conda channels may fail with `SSLEOFError`; use one-off `--override-channels` mirror commands instead of changing global conda config.
 - Project `requirements.txt` uses `openai-whisper==20240930` and omits official `whisper==1.1.10` because the official ASR script needs OpenAI Whisper's `whisper.load_model`.
 - Install project requirements with `--no-build-isolation` if `openai-whisper` fails with `ModuleNotFoundError: No module named 'pkg_resources'`.

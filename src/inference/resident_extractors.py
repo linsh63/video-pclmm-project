@@ -41,7 +41,7 @@ class ResidentExtractorConfig:
     vit_batch_size: int = 16
     face_batch_size: int = 4
     whisper_model: str = "large"
-    whisper_cache_dir: Path = Path("/data4/songxinshuai/cache/whisper")
+    whisper_cache_dir: Path = PROJECT_ROOT / "outputs/cache/whisper"
     torch_home: Path = PROJECT_ROOT / "outputs/cache/torch"
     vit_model_dir: Path = PROJECT_ROOT / "pretrained/googlevit-base-patch16-224-in21k"
     bert_model_dir: Path = PROJECT_ROOT / "pretrained/bert_chinese"

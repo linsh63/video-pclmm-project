@@ -8,10 +8,11 @@ import whisper
 
 
 RUNTIME_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 INPUT_FOLDER_ROOT = Path(os.environ.get("WHISPER_INPUT_ROOT", RUNTIME_ROOT / "temp" / "WAV"))
 OUTPUT_FOLDER_ROOT = Path(os.environ.get("WHISPER_OUTPUT_ROOT", RUNTIME_ROOT / "temp" / "TXT"))
 WHISPER_MODEL = os.environ.get("WHISPER_MODEL", "large")
-WHISPER_CACHE_DIR = os.environ.get("WHISPER_CACHE_DIR", "/data4/songxinshuai/cache/whisper")
+WHISPER_CACHE_DIR = os.environ.get("WHISPER_CACHE_DIR", str(PROJECT_ROOT / "outputs/cache/whisper"))
 
 
 def load_whisper_model():

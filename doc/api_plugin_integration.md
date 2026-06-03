@@ -63,15 +63,15 @@ PCLMM_API_THRESHOLD=0.32
 先进入项目目录并激活环境：
 
 ```bash
-cd /data2/songxinshuai/linsihan/video-pclmm-project
-conda activate /data4/songxinshuai/conda/envs/video-pclmm
+cd <PROJECT_ROOT>
+conda activate <CONDA_ENV_PATH>
 ```
 
 推荐启动方式：
 
 ```bash
 PCLMM_API_FEATURE_BACKEND=resident \
-PCLMM_API_CUDA_VISIBLE_DEVICES=4,5,6,7 \
+PCLMM_API_CUDA_VISIBLE_DEVICES=0,1,2,3 \
 PCLMM_API_DEVICE=cuda:3 \
 PCLMM_API_VIT_DEVICE=cuda:0 \
 PCLMM_API_WHISPER_DEVICE=cuda:1 \
@@ -89,14 +89,14 @@ scripts/run_api.sh
 
 - `PCLMM_API_FEATURE_BACKEND=resident` 表示 API 启动时常驻加载模型，推荐使用。
 - `PCLMM_API_EXTRACTION_MODE=parallel` 表示并行提取多模态特征。
-- `PCLMM_API_CUDA_VISIBLE_DEVICES=4,5,6,7` 后，服务内部的 `cuda:0/1/2/3` 分别对应物理 GPU `4/5/6/7`。
+- `PCLMM_API_CUDA_VISIBLE_DEVICES=0,1,2,3` 后，服务内部的 `cuda:0/1/2/3` 分别对应这里列出的 4 张可见 GPU。
 - `PCLMM_API_THRESHOLD=0.32` 是当前 disabled 测试集上 accuracy 较高的阈值。
 
 如果 resident 版本异常，可以回退到旧的 subprocess 后端：
 
 ```bash
 PCLMM_API_FEATURE_BACKEND=subprocess \
-PCLMM_API_CUDA_VISIBLE_DEVICES=4,5,6,7 \
+PCLMM_API_CUDA_VISIBLE_DEVICES=0,1,2,3 \
 PCLMM_API_EXTRACTION_MODE=parallel \
 scripts/run_api.sh
 ```
@@ -112,7 +112,7 @@ GET /health
 命令：
 
 ```bash
-curl --noproxy '*' http://127.0.0.1:8000/health
+curl --noproxy '*' http://<VIDEO_API_HOST>:8000/health
 ```
 
 返回示例：
@@ -130,7 +130,7 @@ curl --noproxy '*' http://127.0.0.1:8000/health
 FastAPI 也会自动提供接口文档：
 
 ```text
-http://127.0.0.1:8000/docs
+http://<VIDEO_API_HOST>:8000/docs
 ```
 
 ## 5. 视频预测接口
@@ -155,8 +155,8 @@ force_recompute: 可选，true 时强制重新抽取特征
 最小请求：
 
 ```bash
-curl --noproxy '*' -X POST "http://127.0.0.1:8000/predict" \
-  -F "file=@data/raw/videos/disabled/disabled90.mp4"
+curl --noproxy '*' -X POST "http://<VIDEO_API_HOST>:8000/predict" \
+  -F "file=@path/to/video.mp4"
 ```
 
 最小返回：
@@ -170,8 +170,8 @@ curl --noproxy '*' -X POST "http://127.0.0.1:8000/predict" \
 调试请求：
 
 ```bash
-curl --noproxy '*' -X POST "http://127.0.0.1:8000/predict" \
-  -F "file=@data/raw/videos/disabled/disabled90.mp4" \
+curl --noproxy '*' -X POST "http://<VIDEO_API_HOST>:8000/predict" \
+  -F "file=@path/to/video.mp4" \
   -F "debug=true" \
   -F "force_recompute=true"
 ```
@@ -184,7 +184,7 @@ curl --noproxy '*' -X POST "http://127.0.0.1:8000/predict" \
   "score": 0.00105,
   "threshold": 0.32,
   "prediction": 0,
-  "file_id": "disabled90_xxxxxxxx",
+  "file_id": "example_video_xxxxxxxx",
   "feature_backend": "resident",
   "extraction_mode": "parallel",
   "timings": {
@@ -210,7 +210,8 @@ export async function checkVideoByModel(videoPath) {
   const form = new FormData();
   form.append("file", fs.createReadStream(videoPath));
 
-  const response = await fetch("http://127.0.0.1:8000/predict", {
+  const apiBaseUrl = process.env.VIDEO_REVIEW_API_URL ?? "http://localhost:8000";
+  const response = await fetch(`${apiBaseUrl}/predict`, {
     method: "POST",
     body: form,
   });
@@ -252,7 +253,8 @@ async function predictVideo(file) {
   const form = new FormData();
   form.append("file", file);
 
-  const response = await fetch("http://127.0.0.1:8000/predict", {
+  const apiBaseUrl = "http://localhost:8000";
+  const response = await fetch(`${apiBaseUrl}/predict`, {
     method: "POST",
     body: form,
   });
@@ -286,7 +288,7 @@ async function predictVideo(file) {
 
 ## 9. 性能说明
 
-在当前 8 卡 3090 服务器上，`disabled90.mp4` 约 10 秒视频的冷缓存耗时：
+在测试服务器上，约 10 秒短视频的冷缓存参考耗时：
 
 ```text
 串行 subprocess: 约 65 秒
@@ -336,7 +338,7 @@ outputs/checkpoints/multi_modal_cross_attention_model.pth
 pretrained/googlevit-base-patch16-224-in21k/
 pretrained/bert_chinese/
 pretrained/FER-VT/
-Whisper cache，例如 /data4/songxinshuai/cache/whisper/large-v3.pt
+Whisper cache，例如 <WHISPER_CACHE_DIR>/large-v3.pt
 ```
 
 如果缺少这些文件，API 启动或第一次请求会失败。
@@ -352,4 +354,3 @@ Whisper cache，例如 /data4/songxinshuai/cache/whisper/large-v3.pt
 - `debug=true` 时可以看到 `score` 和 `timings`
 - 业务后端只在 `is_normal=true` 时正式发布视频
 - 异常情况不会直接发布视频
-

@@ -20,7 +20,7 @@ def parse_args() -> argparse.Namespace:
         description="Predict one video from already extracted PCLMM features."
     )
     parser.add_argument("--checkpoint", default="outputs/checkpoints/multi_modal_cross_attention_model.pth")
-    parser.add_argument("--file-id", default=None, help="Feature basename, for example disabled90.")
+    parser.add_argument("--file-id", default=None, help="Feature basename, for example example_video.")
     parser.add_argument("--text-dir", default="features/TEXT_features")
     parser.add_argument("--audio-dir", default="features/AUDIO_features")
     parser.add_argument("--video-dir", default="features/VIT_features")

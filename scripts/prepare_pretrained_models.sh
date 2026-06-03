@@ -2,14 +2,14 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PYTHON_BIN="${PYTHON_BIN:-/data4/songxinshuai/conda/envs/video-pclmm/bin/python}"
+PYTHON_BIN="${PYTHON_BIN:-python}"
 
 PRETRAINED_DIR="${PRETRAINED_DIR:-$PROJECT_ROOT/pretrained}"
 VIT_REPO="${VIT_REPO:-google/vit-base-patch16-224-in21k}"
 BERT_REPO="${BERT_REPO:-google-bert/bert-base-chinese}"
 MODEL_SOURCE="${MODEL_SOURCE:-modelscope}"
-HF_HOME="${HF_HOME:-/data4/songxinshuai/hf_cache}"
-XDG_CACHE_HOME="${XDG_CACHE_HOME:-/data4/songxinshuai/cache}"
+HF_HOME="${HF_HOME:-$PROJECT_ROOT/outputs/cache/huggingface}"
+XDG_CACHE_HOME="${XDG_CACHE_HOME:-$PROJECT_ROOT/outputs/cache}"
 WHISPER_CACHE_DIR="${WHISPER_CACHE_DIR:-$XDG_CACHE_HOME/whisper}"
 FER_VT_DIR="${FER_VT_DIR:-$PRETRAINED_DIR/FER-VT}"
 

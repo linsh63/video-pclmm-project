@@ -8,9 +8,9 @@ fi
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUNTIME_ROOT="${RUNTIME_ROOT:-$PROJECT_ROOT/outputs/official_runtime}"
-PYTHON_BIN="${PYTHON_BIN:-/data4/songxinshuai/conda/envs/video-pclmm/bin/python}"
-CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-4,5,6,7}"
-WHISPER_CACHE_DIR="${WHISPER_CACHE_DIR:-/data4/songxinshuai/cache/whisper}"
+PYTHON_BIN="${PYTHON_BIN:-python}"
+CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0,1,2,3}"
+WHISPER_CACHE_DIR="${WHISPER_CACHE_DIR:-$PROJECT_ROOT/outputs/cache/whisper}"
 XDG_CACHE_HOME="${XDG_CACHE_HOME:-$PROJECT_ROOT/outputs/cache}"
 HF_HOME="${HF_HOME:-$PROJECT_ROOT/outputs/cache/huggingface}"
 TRANSFORMERS_CACHE="${TRANSFORMERS_CACHE:-$HF_HOME/transformers}"

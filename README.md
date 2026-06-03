@@ -72,15 +72,15 @@ PCLMM_API_THRESHOLD=0.32
 先进入项目目录并激活环境：
 
 ```bash
-cd /data2/songxinshuai/linsihan/video-pclmm-project
-conda activate /data4/songxinshuai/conda/envs/video-pclmm
+cd <PROJECT_ROOT>
+conda activate <CONDA_ENV_PATH>
 ```
 
 推荐启动方式：
 
 ```bash
 PCLMM_API_FEATURE_BACKEND=resident \
-PCLMM_API_CUDA_VISIBLE_DEVICES=4,5,6,7 \
+PCLMM_API_CUDA_VISIBLE_DEVICES=0,1,2,3 \
 PCLMM_API_DEVICE=cuda:3 \
 PCLMM_API_VIT_DEVICE=cuda:0 \
 PCLMM_API_WHISPER_DEVICE=cuda:1 \
@@ -98,14 +98,14 @@ scripts/run_api.sh
 
 - `PCLMM_API_FEATURE_BACKEND=resident`：API 启动时常驻加载 ViT、Whisper、BERT、FER-VT 和融合模型。
 - `PCLMM_API_EXTRACTION_MODE=parallel`：并行提取多模态特征。
-- `PCLMM_API_CUDA_VISIBLE_DEVICES=4,5,6,7` 后，服务内部的 `cuda:0/1/2/3` 对应物理 GPU `4/5/6/7`。
+- `PCLMM_API_CUDA_VISIBLE_DEVICES=0,1,2,3` 后，服务内部的 `cuda:0/1/2/3` 对应这里列出的 4 张可见 GPU。
 - `PCLMM_API_THRESHOLD=0.32` 是当前测试集中准确率较高的阈值。
 
 如果 resident 后端异常，可以临时回退：
 
 ```bash
 PCLMM_API_FEATURE_BACKEND=subprocess \
-PCLMM_API_CUDA_VISIBLE_DEVICES=4,5,6,7 \
+PCLMM_API_CUDA_VISIBLE_DEVICES=0,1,2,3 \
 PCLMM_API_EXTRACTION_MODE=parallel \
 scripts/run_api.sh
 ```
@@ -115,13 +115,13 @@ scripts/run_api.sh
 健康检查：
 
 ```bash
-curl --noproxy '*' http://127.0.0.1:8000/health
+curl --noproxy '*' http://<VIDEO_API_HOST>:8000/health
 ```
 
 视频审核：
 
 ```bash
-curl --noproxy '*' -X POST "http://127.0.0.1:8000/predict" \
+curl --noproxy '*' -X POST "http://<VIDEO_API_HOST>:8000/predict" \
   -F "file=@path/to/video.mp4"
 ```
 
@@ -134,7 +134,7 @@ curl --noproxy '*' -X POST "http://127.0.0.1:8000/predict" \
 调试模式：
 
 ```bash
-curl --noproxy '*' -X POST "http://127.0.0.1:8000/predict" \
+curl --noproxy '*' -X POST "http://<VIDEO_API_HOST>:8000/predict" \
   -F "file=@path/to/video.mp4" \
   -F "debug=true" \
   -F "force_recompute=true"
@@ -155,7 +155,8 @@ export async function checkVideoByModel(videoPath) {
   const form = new FormData();
   form.append("file", fs.createReadStream(videoPath));
 
-  const response = await fetch("http://127.0.0.1:8000/predict", {
+  const apiBaseUrl = process.env.VIDEO_REVIEW_API_URL ?? "http://localhost:8000";
+  const response = await fetch(`${apiBaseUrl}/predict`, {
     method: "POST",
     body: form,
   });
@@ -178,7 +179,7 @@ export async function checkVideoByModel(videoPath) {
 
 ## 性能概况
 
-在当前 8 卡 RTX 3090 服务器上，约 10 秒视频 `disabled90.mp4` 的冷缓存耗时：
+在测试服务器上，约 10 秒短视频的冷缓存参考耗时：
 
 ```text
 串行 subprocess: 约 65 秒
@@ -238,39 +239,39 @@ outputs/checkpoints/multi_modal_cross_attention_model.pth
 pretrained/googlevit-base-patch16-224-in21k/
 pretrained/bert_chinese/
 pretrained/FER-VT/
-Whisper cache，例如 /data4/songxinshuai/cache/whisper/large-v3.pt
+Whisper cache，例如 <WHISPER_CACHE_DIR>/large-v3.pt
 ```
 
 如果这些文件缺失，API 启动或第一次请求会失败。
 
 ## 环境准备
 
-本项目使用 conda 环境，但不使用 `environment.yml`。共享服务器根目录空间可能较小，建议把 conda 环境、包缓存和临时目录放到 `/data4`。
+本项目使用 conda 环境，但不使用 `environment.yml`。共享服务器根目录空间可能较小，建议把 conda 环境、包缓存和临时目录放到空间充足的数据盘。
 
 ```bash
-cd /data2/songxinshuai/linsihan/video-pclmm-project
+cd <PROJECT_ROOT>
 
-mkdir -p /data4/songxinshuai/conda/envs
-mkdir -p /data4/songxinshuai/conda/pkgs
-mkdir -p /data4/songxinshuai/tmp
+mkdir -p <CONDA_ROOT>/envs
+mkdir -p <CONDA_ROOT>/pkgs
+mkdir -p <TMPDIR>
 
-CONDA_PKGS_DIRS=/data4/songxinshuai/conda/pkgs \
-conda create -y -p /data4/songxinshuai/conda/envs/video-pclmm \
+CONDA_PKGS_DIRS=<CONDA_ROOT>/pkgs \
+conda create -y -p <CONDA_ENV_PATH> \
   --override-channels \
   -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main \
   -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r \
   python=3.10 pip
 
-conda activate /data4/songxinshuai/conda/envs/video-pclmm
+conda activate <CONDA_ENV_PATH>
 
 python -m pip install --upgrade pip setuptools wheel
 
-TMPDIR=/data4/songxinshuai/tmp \
+TMPDIR=<TMPDIR> \
 PIP_NO_CACHE_DIR=1 \
 python -m pip install --no-build-isolation -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 
-CONDA_PKGS_DIRS=/data4/songxinshuai/conda/pkgs \
-conda install -y -p /data4/songxinshuai/conda/envs/video-pclmm \
+CONDA_PKGS_DIRS=<CONDA_ROOT>/pkgs \
+conda install -y -p <CONDA_ENV_PATH> \
   --override-channels \
   -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main \
   -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge \
@@ -296,4 +297,3 @@ ffmpeg -version
 - PCLMM GitHub: https://github.com/dut-laowang/PCLMM
 - PCLMM Dataset: https://zenodo.org/records/15128981
 - Paper: Towards Patronizing and Condescending Language in Chinese Videos: A Multimodal Dataset and Detector, ICASSP 2025
-
