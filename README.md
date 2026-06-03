@@ -244,6 +244,39 @@ Whisper cache，例如 <WHISPER_CACHE_DIR>/large-v3.pt
 
 如果这些文件缺失，API 启动或第一次请求会失败。
 
+## 运行资产发布
+
+这些运行资产不建议提交进 Git 仓库本体，因为多个模型文件超过 GitHub 普通仓库的单文件限制。推荐把它们作为 GitHub Release assets 上传。
+
+本机打包命令：
+
+```bash
+VERSION=v0.1.0 \
+WHISPER_FILE=<WHISPER_CACHE_DIR>/large-v3.pt \
+bash scripts/package_runtime_assets.sh
+```
+
+打包后会在 `outputs/release_assets/` 生成：
+
+```text
+video-pclmm-runtime-core-v0.1.0.tar.gz
+whisper-large-v3.pt.part-*
+whisper-large-v3.pt.sha256
+runtime-assets-v0.1.0.sha256
+```
+
+其中 `video-pclmm-runtime-core-*.tar.gz` 包含 checkpoint、ViT、BERT、FER-VT 和 ResNet34 人脸检测权重。Whisper `large-v3.pt` 超过 GitHub Release 单文件大小限制，因此脚本会切分成多个 part 上传。
+
+发布时可以在 GitHub 仓库页面创建一个 Release，例如 `runtime-v0.1.0`，然后上传 `outputs/release_assets/` 下的这些文件。
+
+小组成员 clone 仓库后，先把 Release assets 下载到 `outputs/release_assets/`，再执行：
+
+```bash
+VERSION=v0.1.0 bash scripts/install_runtime_assets.sh
+```
+
+安装完成后再启动 API 服务。这样他们不需要重新训练模型，也不需要重新在数据集上提取特征。
+
 ## 环境准备
 
 本项目使用 conda 环境，但不使用 `environment.yml`。共享服务器根目录空间可能较小，建议把 conda 环境、包缓存和临时目录放到空间充足的数据盘。
