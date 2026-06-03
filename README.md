@@ -98,7 +98,7 @@ whisper-large-v3.pt.sha256
 mkdir -p outputs/release_assets
 cd outputs/release_assets
 
-RELEASE_DOWNLOAD_BASE_URL=<RELEASE_DOWNLOAD_BASE_URL>
+RELEASE_DOWNLOAD_BASE_URL=https://github.com/linsh63/video-pclmm-project/releases/download/v0.1.0
 
 curl -L -O "$RELEASE_DOWNLOAD_BASE_URL/runtime-assets-v0.1.0.sha256"
 curl -L -O "$RELEASE_DOWNLOAD_BASE_URL/video-pclmm-runtime-core-v0.1.0.tar.gz"
@@ -111,7 +111,7 @@ sha256sum -c runtime-assets-v0.1.0.sha256
 cd ../..
 ```
 
-其中 `<RELEASE_DOWNLOAD_BASE_URL>` 形如：
+其中 `RELEASE_DOWNLOAD_BASE_URL` 的格式为：
 
 ```text
 https://github.com/<OWNER>/<REPO>/releases/download/v0.1.0
