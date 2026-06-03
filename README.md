@@ -67,6 +67,91 @@ PCLMM_API_THRESHOLD=0.32
 - [视频审核 API 插件接入指南](doc/api_plugin_integration.md)
 - [底层模型 API 阶段规划](doc/model_api_plan.md)
 
+## 小组成员部署流程
+
+clone 仓库后不需要重新训练，也不需要重新在数据集上提取特征；只需要准备 Python 环境、下载 Release 运行资产，然后启动 API。
+
+1. 获取代码：
+
+```bash
+git clone <REPO_URL>
+cd video-pclmm-project
+```
+
+2. 按本文档的 [环境准备](#环境准备) 创建并激活 conda 环境。
+
+3. 下载 GitHub Release 运行资产。
+
+在 Release 页面下载以下 5 个文件到 `outputs/release_assets/`：
+
+```text
+runtime-assets-v0.1.0.sha256
+video-pclmm-runtime-core-v0.1.0.tar.gz
+whisper-large-v3.pt.part-aa
+whisper-large-v3.pt.part-ab
+whisper-large-v3.pt.sha256
+```
+
+也可以用命令行下载：
+
+```bash
+mkdir -p outputs/release_assets
+cd outputs/release_assets
+
+RELEASE_DOWNLOAD_BASE_URL=<RELEASE_DOWNLOAD_BASE_URL>
+
+curl -L -O "$RELEASE_DOWNLOAD_BASE_URL/runtime-assets-v0.1.0.sha256"
+curl -L -O "$RELEASE_DOWNLOAD_BASE_URL/video-pclmm-runtime-core-v0.1.0.tar.gz"
+curl -L -O "$RELEASE_DOWNLOAD_BASE_URL/whisper-large-v3.pt.part-aa"
+curl -L -O "$RELEASE_DOWNLOAD_BASE_URL/whisper-large-v3.pt.part-ab"
+curl -L -O "$RELEASE_DOWNLOAD_BASE_URL/whisper-large-v3.pt.sha256"
+
+sha256sum -c runtime-assets-v0.1.0.sha256
+
+cd ../..
+```
+
+其中 `<RELEASE_DOWNLOAD_BASE_URL>` 形如：
+
+```text
+https://github.com/<OWNER>/<REPO>/releases/download/v0.1.0
+```
+
+4. 安装运行资产：
+
+```bash
+VERSION=v0.1.0 bash scripts/install_runtime_assets.sh
+```
+
+5. 启动 API 服务：
+
+```bash
+PCLMM_API_FEATURE_BACKEND=resident \
+PCLMM_API_CUDA_VISIBLE_DEVICES=0,1,2,3 \
+PCLMM_API_DEVICE=cuda:3 \
+PCLMM_API_VIT_DEVICE=cuda:0 \
+PCLMM_API_WHISPER_DEVICE=cuda:1 \
+PCLMM_API_BERT_DEVICE=cuda:1 \
+PCLMM_API_FACE_DEVICE=cuda:2 \
+PCLMM_API_EXTRACTION_MODE=parallel \
+PCLMM_API_THRESHOLD=0.32 \
+PCLMM_API_VIT_BATCH_SIZE=16 \
+HOST=0.0.0.0 \
+PORT=8000 \
+scripts/run_api.sh
+```
+
+6. 验收服务：
+
+```bash
+curl --noproxy '*' http://<VIDEO_API_HOST>:8000/health
+
+curl --noproxy '*' -X POST "http://<VIDEO_API_HOST>:8000/predict" \
+  -F "file=@path/to/video.mp4"
+```
+
+如果 `/health` 返回 `ok=true`，并且 `/predict` 返回 `{"is_normal": true/false}`，说明服务已经跑通。
+
 ## 启动 API 服务
 
 先进入项目目录并激活环境：
