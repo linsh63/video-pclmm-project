@@ -37,10 +37,13 @@ temp/
 # Runtime outputs
 outputs/*
 !outputs/figures/
+outputs/figures/*
 !outputs/figures/.gitkeep
 !outputs/metrics/
+outputs/metrics/*
 !outputs/metrics/.gitkeep
 !outputs/predictions/
+outputs/predictions/*
 !outputs/predictions/.gitkeep
 *.log
 

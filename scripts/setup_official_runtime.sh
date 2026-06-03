@@ -14,7 +14,11 @@ mkdir -p "$RUNTIME_ROOT" "$FEATURE_ROOT" "$TEMP_ROOT"
 mkdir -p "$CODE_DST"
 
 cp "$CODE_SRC"/*.py "$CODE_DST"/
-cp "$PROJECT_ROOT/data/annotations/Annotation_Subset.csv" "$CODE_DST/Annotation.csv"
+if [[ -f "$PROJECT_ROOT/data/annotations/Annotation_Subset.csv" ]]; then
+  cp "$PROJECT_ROOT/data/annotations/Annotation_Subset.csv" "$CODE_DST/Annotation.csv"
+else
+  printf 'File,Annotation,Source_Link,Title,Subset\n' > "$CODE_DST/Annotation.csv"
+fi
 cp "$PROJECT_ROOT/src/extraction/mfcc_compatible.py" "$CODE_DST/MFCC.py"
 cp "$PROJECT_ROOT/src/extraction/extract_audio_text_compatible.py" "$CODE_DST/extract_audio_text.py"
 
